@@ -6,6 +6,9 @@ import numpy as np
 import pandas as pd
 from sklearn.neighbors import KDTree
 
+import config as cfg
+import h5py
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 base_path = cfg.DATASET_FOLDER
 
@@ -33,7 +36,7 @@ p3 = [5735237.358209,620543.094379]
 p4 = [5734749.303802,619932.693364]
 p = [p1,p2,p3,p4]
 
-
+# 判断每一帧pointcloud是训练集还是测试集，将一个经纬度范围内的数据集设定为训练集
 def check_in_test_set(northing, easting, points, x_width, y_width):
     in_test_set = False
     for point in points:
@@ -48,18 +51,21 @@ def construct_query_dict(df_centroids, filename):
     tree = KDTree(df_centroids[['northing','easting']])
     ind_nn = tree.query_radius(df_centroids[['northing','easting']],r=10)
     ind_r = tree.query_radius(df_centroids[['northing','easting']], r=50)
-    queries = {}
-    for i in range(len(ind_nn)):
-        query = df_centroids.iloc[i]["file"]
-        positives = np.setdiff1d(ind_nn[i],[i]).tolist()
-        negatives = np.setdiff1d(
-            df_centroids.index.values.tolist(),ind_r[i]).tolist()
-        random.shuffle(negatives)
-        queries[i] = {"query":query,
-                      "positives":positives,"negatives":negatives}
 
-    with open(filename, 'wb') as handle:
-        pickle.dump(queries, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    with h5py.File(filename, mode='w') as h5:
+        h5_positives=h5.create_dataset("positives",dtype=np.int)
+        h5_negatives = h5.create_dataset("negatives", dtype=np.int)
+        for i in range(len(ind_nn)):
+            query = df_centroids.iloc[i]["file"]
+            positives = np.setdiff1d(ind_nn[i],[i]).tolist()
+            negatives = np.setdiff1d(
+                df_centroids.index.values.tolist(),ind_r[i]).tolist()
+            random.shuffle(negatives)
+            h5_positives[i]=positives
+            h5_negatives[i]=negatives
+            # h5_querys[i] = {"query":query,
+            #               "positives":positives,"negatives":negatives}
+
 
     print("Done ", filename)
 

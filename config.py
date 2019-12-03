@@ -7,7 +7,7 @@ OUTPUT_FILE = "results/results.txt"
 LOG_DIR = 'log/'
 MODEL_FILENAME = "model.ckpt"
 
-DATASET_FOLDER = '../../benchmark_datasets/'
+DATASET_FOLDER = '/home/huxian/drive/file-drive/HUXIAN/项目数据集/pointnetvlad/benchmark_datasets'
 
 # TRAIN
 BATCH_NUM_QUERIES = 2
