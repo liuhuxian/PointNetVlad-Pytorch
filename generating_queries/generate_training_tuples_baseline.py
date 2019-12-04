@@ -51,21 +51,17 @@ def construct_query_dict(df_centroids, filename):
     tree = KDTree(df_centroids[['northing','easting']])
     ind_nn = tree.query_radius(df_centroids[['northing','easting']],r=10)
     ind_r = tree.query_radius(df_centroids[['northing','easting']], r=50)
-
-    with h5py.File(filename, mode='w') as h5:
-        h5_positives=h5.create_dataset("positives",dtype=np.int)
-        h5_negatives = h5.create_dataset("negatives", dtype=np.int)
-        for i in range(len(ind_nn)):
-            query = df_centroids.iloc[i]["file"]
-            positives = np.setdiff1d(ind_nn[i],[i]).tolist()
-            negatives = np.setdiff1d(
-                df_centroids.index.values.tolist(),ind_r[i]).tolist()
-            random.shuffle(negatives)
-            h5_positives[i]=positives
-            h5_negatives[i]=negatives
-            # h5_querys[i] = {"query":query,
-            #               "positives":positives,"negatives":negatives}
-
+    queries = {}
+    for i in range(len(ind_nn)):
+        query = df_centroids.iloc[i]["file"]
+        positives = np.setdiff1d(ind_nn[i],[i]).tolist()
+        negatives = np.setdiff1d(
+            df_centroids.index.values.tolist(),ind_r[i]).tolist()
+        random.shuffle(negatives)
+        queries[i] = {"query":query,
+                      "positives":positives,"negatives":negatives}
+    with open(filename, 'wb') as handle:
+        pickle.dump(queries, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     print("Done ", filename)
 
