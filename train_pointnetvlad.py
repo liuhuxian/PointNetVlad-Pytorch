@@ -65,7 +65,7 @@ parser.add_argument('--triplet_use_best_positives', action='store_true',
                     help='If present, use best positives, otherwise use hardest positives')
 parser.add_argument('--resume', action='store_true',
                     help='If present, restore checkpoint and resume training')
-parser.add_argument('--dataset_folder', default='../../dataset/',
+parser.add_argument('--dataset_folder', default='/home/huxian/drive/file-drive/HUXIAN/项目数据集/pointnetvlad/benchmark_datasets',
                     help='PointNetVlad Dataset Folder')
 
 FLAGS = parser.parse_args()
@@ -243,9 +243,11 @@ def train_one_epoch(model, optimizer, train_writer, loss_function, epoch):
             elif (len(HARD_NEGATIVES.keys()) == 0):
                 query = get_feature_representation(
                     TRAINING_QUERIES[batch_keys[j]]['query'], model)
-                random.shuffle(TRAINING_QUERIES[batch_keys[j]]['negatives'])
-                negatives = TRAINING_QUERIES[batch_keys[j]
-                                             ]['negatives'][0:sampled_neg]
+                dict_negatives=np.setdiff1d(list(range(len(TRAINING_QUERIES))),TRAINING_QUERIES[batch_keys[j]]['positives50']).tolist()
+                random.shuffle(dict_negatives)
+                negatives =dict_negatives[0:sampled_neg]
+                del dict_negatives
+                # 在negatives中选择距离最近的num_to_take来作为hard_negs
                 hard_negs = get_random_hard_negatives(
                     query, negatives, num_to_take)
                 print(hard_negs)
@@ -257,9 +259,13 @@ def train_one_epoch(model, optimizer, train_writer, loss_function, epoch):
             else:
                 query = get_feature_representation(
                     TRAINING_QUERIES[batch_keys[j]]['query'], model)
-                random.shuffle(TRAINING_QUERIES[batch_keys[j]]['negatives'])
-                negatives = TRAINING_QUERIES[batch_keys[j]
-                                             ]['negatives'][0:sampled_neg]
+
+                dict_negatives = np.setdiff1d(list(range(len(TRAINING_QUERIES))),
+                                         TRAINING_QUERIES[batch_keys[j]]['positives50']).tolist()
+                random.shuffle(dict_negatives)
+                negatives = dict_negatives[0:sampled_neg]
+                del dict_negatives
+
                 hard_negs = get_random_hard_negatives(
                     query, negatives, num_to_take)
                 hard_negs = list(set().union(

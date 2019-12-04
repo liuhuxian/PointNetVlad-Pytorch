@@ -88,6 +88,7 @@ def get_query_tuple(dict_value, num_pos, num_neg, QUERY_DICT, hard_neg=[], other
 
     query = load_pc_file(dict_value["query"])  # Nx3
 
+
     random.shuffle(dict_value["positives"])
     pos_files = []
 
@@ -98,24 +99,27 @@ def get_query_tuple(dict_value, num_pos, num_neg, QUERY_DICT, hard_neg=[], other
 
     neg_files = []
     neg_indices = []
+
+    dict_negatives = np.setdiff1d(list(range(len(dict_value['query']))),
+                                      dict_value['positives50']).tolist()
+    random.shuffle(dict_negatives)
     if(len(hard_neg) == 0):
-        random.shuffle(dict_value["negatives"])
+
         for i in range(num_neg):
-            neg_files.append(QUERY_DICT[dict_value["negatives"][i]]["query"])
-            neg_indices.append(dict_value["negatives"][i])
+            neg_files.append(QUERY_DICT[dict_negatives[i]]["query"])
+            neg_indices.append(dict_negatives[i])
 
     else:
-        random.shuffle(dict_value["negatives"])
         for i in hard_neg:
             neg_files.append(QUERY_DICT[i]["query"])
             neg_indices.append(i)
         j = 0
         while(len(neg_files) < num_neg):
 
-            if not dict_value["negatives"][j] in hard_neg:
+            if not dict_negatives[j] in hard_neg:
                 neg_files.append(
-                    QUERY_DICT[dict_value["negatives"][j]]["query"])
-                neg_indices.append(dict_value["negatives"][j])
+                    QUERY_DICT[dict_negatives[j]]["query"])
+                neg_indices.append(dict_negatives[j])
             j += 1
 
     negatives = load_pc_files(neg_files)
