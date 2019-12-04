@@ -58,6 +58,7 @@ def construct_query_dict(df_centroids, filename):
         queries[i] = {"query":query,
                       "positives":positives,"negatives":negatives}
 
+#somecorrect
     with open(filename, 'wb') as handle:
         pickle.dump(queries, handle, protocol=pickle.HIGHEST_PROTOCOL)
 

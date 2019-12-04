@@ -2,4 +2,4 @@
 *.pickle
 log*
 results*
-*.idea
+.idea*
