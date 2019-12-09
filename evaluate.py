@@ -34,7 +34,7 @@ def evaluate():
                                       output_dim=cfg.FEATURE_OUTPUT_DIM, num_points=cfg.NUM_POINTS)
     model = model.to(device)
 
-    resume_filename = cfg.LOG_DIR + "checkpoint.pth.tar"
+    resume_filename = cfg.LOG_DIR +cfg.MODEL_FILENAME
     print("Resuming From ", resume_filename)
     checkpoint = torch.load(resume_filename)
     saved_state_dict = checkpoint['state_dict']
@@ -221,7 +221,7 @@ if __name__ == "__main__":
                         help='Decay rate for lr decay [default: 0.8]')
     parser.add_argument('--results_dir', default='results/',
                         help='results dir [default: results]')
-    parser.add_argument('--dataset_folder', default='../../dataset/',
+    parser.add_argument('--dataset_folder', default='/home/huxian/drive/file-drive/HUXIAN/项目数据集/pointnetvlad/benchmark_datasets',
                         help='PointNetVlad Dataset Folder')
     FLAGS = parser.parse_args()
 

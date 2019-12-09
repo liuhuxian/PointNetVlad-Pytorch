@@ -19,7 +19,8 @@ def get_sets_dict(filename):
         print("Trajectories Loaded.")
         return trajectories
 
-
+# read pointcloud files
+# 读取点云文件
 def load_pc_file(filename):
     # returns Nx3 matrix
     pc = np.fromfile(os.path.join(cfg.DATASET_FOLDER, filename), dtype=np.float64)
@@ -86,6 +87,7 @@ def get_query_tuple(dict_value, num_pos, num_neg, QUERY_DICT, hard_neg=[], other
         # get query tuple for dictionary entry
         # return list [query,positives,negatives]
 
+    # query poincloud
     query = load_pc_file(dict_value["query"])  # Nx3
 
 
@@ -100,11 +102,13 @@ def get_query_tuple(dict_value, num_pos, num_neg, QUERY_DICT, hard_neg=[], other
     neg_files = []
     neg_indices = []
 
+    # 只要不是'positives50'里的帧都待定为negatives放入dict_negatives
     dict_negatives = np.setdiff1d(list(range(len(dict_value['query']))),
                                       dict_value['positives50']).tolist()
     random.shuffle(dict_negatives)
     if(len(hard_neg) == 0):
 
+        # 相当于随机选取num_neg放入neg_files，neg_indices中
         for i in range(num_neg):
             neg_files.append(QUERY_DICT[dict_negatives[i]]["query"])
             neg_indices.append(dict_negatives[i])
@@ -126,7 +130,8 @@ def get_query_tuple(dict_value, num_pos, num_neg, QUERY_DICT, hard_neg=[], other
 
     if other_neg is False:
         return [query, positives, negatives]
-    # For Quadruplet Loss
+    # For Quadruplet Loss,that is get all point clouds dissimilar to T(T is the training tuple)
+    # 先找出和训练元组T相似的图片，然后就找到了和训练元组T不相似的图片
     else:
         # get neighbors of negatives and query
         neighbors = []

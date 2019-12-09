@@ -219,6 +219,8 @@ def train_one_epoch(model, optimizer, train_writer, loss_function, epoch):
     train_file_idxs = np.arange(0, len(TRAINING_QUERIES.keys()))
     np.random.shuffle(train_file_idxs)
 
+    # for every batch
+    # 对于每个batch
     for i in range(len(train_file_idxs)//cfg.BATCH_NUM_QUERIES):
         # for i in range (5):
         batch_keys = train_file_idxs[i *
@@ -227,6 +229,7 @@ def train_one_epoch(model, optimizer, train_writer, loss_function, epoch):
 
         faulty_tuple = False
         no_other_neg = False
+        # 对于batch中的每一帧
         for j in range(cfg.BATCH_NUM_QUERIES):
             if (len(TRAINING_QUERIES[batch_keys[j]]["positives"]) < cfg.TRAIN_POSITIVES_PER_QUERY):
                 faulty_tuple = True

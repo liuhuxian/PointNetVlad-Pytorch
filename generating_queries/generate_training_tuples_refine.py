@@ -6,6 +6,8 @@ import numpy as np
 import pandas as pd
 from sklearn.neighbors import KDTree
 
+import config as cfg
+
 #####For training and test data split#####
 x_width = 150
 y_width = 150
@@ -48,12 +50,13 @@ def construct_query_dict(df_centroids, filename):
     print(len(ind_nn))
     for i in range(len(ind_nn)):
         query = df_centroids.iloc[i]["file"]
-        positives = np.setdiff1d(ind_nn[i],[i]).tolist()
-        negatives = np.setdiff1d(
-            df_centroids.index.values.tolist(),ind_r[i]).tolist()
-        random.shuffle(negatives)
+        positives10 = np.setdiff1d(ind_nn[i],[i]).tolist()
+        positives50 = np.setdiff1d(ind_r[i], [i]).tolist()
+        # negatives = np.setdiff1d(
+        #     df_centroids.index.values.tolist(),ind_r[i]).tolist()
+        # random.shuffle(negatives)
         queries[i] = {"query":query,
-                      "positives":positives,"negatives":negatives}
+                      "positives":positives10,"positives50":positives50}
 
     with open(filename, 'wb') as handle:
         pickle.dump(queries, handle, protocol=pickle.HIGHEST_PROTOCOL)
