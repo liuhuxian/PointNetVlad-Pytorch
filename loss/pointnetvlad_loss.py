@@ -70,6 +70,7 @@ def quadruplet_loss(q_vec, pos_vecs, neg_vecs, other_neg, m1, m2, use_min=False,
     if ignore_zero_loss:
         hard_triplets = torch.gt(triplet_loss, 1e-16).float()
         num_hard_triplets = torch.sum(hard_triplets)
+        # 这里其实是求平均值的意思
         triplet_loss = triplet_loss.sum() / (num_hard_triplets + 1e-16)
     else:
         triplet_loss = triplet_loss.mean()

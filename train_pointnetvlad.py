@@ -271,6 +271,7 @@ def train_one_epoch(model, optimizer, train_writer, loss_function, epoch):
 
                 hard_negs = get_random_hard_negatives(
                     query, negatives, num_to_take)
+                # 将HARD_NEGATIVES[batch_keys[j]]和hard_negs合并，并且list化
                 hard_negs = list(set().union(
                     HARD_NEGATIVES[batch_keys[j]], hard_negs))
                 print('hard', hard_negs)

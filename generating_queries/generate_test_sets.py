@@ -49,6 +49,7 @@ def output_to_file(output, filename):
 
 
 def construct_query_and_database_sets(base_path, runs_folder, folders, pointcloud_fols, filename, p, output_name):
+    # 对每个文件夹内的帧进行聚类放入database_trees。其中在p1~p4附近的放入test_trees
     database_trees = []
     test_trees = []
     for folder in folders:
@@ -73,6 +74,7 @@ def construct_query_and_database_sets(base_path, runs_folder, folders, pointclou
         database_trees.append(database_tree)
         test_trees.append(test_tree)
 
+    # 对于每个文件夹，将df_locations中的信息放入database_sets中，其中p1~p4附近的放入test_sets
     test_sets = []
     database_sets = []
     for folder in folders:
@@ -80,6 +82,7 @@ def construct_query_and_database_sets(base_path, runs_folder, folders, pointclou
         test = {}
         df_locations = pd.read_csv(os.path.join(
             base_path,runs_folder,folder,filename),sep=',')
+        # 将timestamp修改为对应的地址
         df_locations['timestamp'] = runs_folder+folder + \
             pointcloud_fols+df_locations['timestamp'].astype(str)+'.bin'
         df_locations = df_locations.rename(columns={'timestamp':'file'})
@@ -106,6 +109,8 @@ def construct_query_and_database_sets(base_path, runs_folder, folders, pointclou
                     [[test_sets[j][key]["northing"],test_sets[j][key]["easting"]]])
                 index = tree.query_radius(coor, r=25)
                 # indices of the positive matches in database i of each query (key) in test set j
+                # test_sets[j][key]表示文件夹j中准备要测试test的文件。test_sets[j][key][i]放着
+                # test_sets[j][key]与在文件夹i中相似的文件
                 test_sets[j][key][i] = index[0].tolist()
 
     output_to_file(database_sets, output_name+'_evaluation_database.pickle')
