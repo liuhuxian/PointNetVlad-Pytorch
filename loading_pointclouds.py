@@ -131,7 +131,7 @@ def get_query_tuple(dict_value, num_pos, num_neg, QUERY_DICT, hard_neg=[], other
     if other_neg is False:
         return [query, positives, negatives]
     # For Quadruplet Loss,that is get all point clouds dissimilar to T(T is the training tuple)
-    # 先找出和训练元组T相似的图片，然后就找到了和训练元组T不相似的图片
+    # 先找出和训练元组T相似的一组图片，然后就找到了和训练元组T不相似的一组图片。再从这组图片中随机抽取一张
     else:
         # get neighbors of negatives and query
         neighbors = []

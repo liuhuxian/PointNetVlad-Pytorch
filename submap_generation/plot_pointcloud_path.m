@@ -1,6 +1,6 @@
 function plot_pointcloud_path(base_path)
     %base_path='/media/deep-two/896cd795-f10d-4e67-b8c0-69bbf9c978f1/Robotcar/2014-12-05-11-09-10/';
-    data = importdata(strcat(base_path,'test.csv'));
+    data = importdata(strcat(base_path,'pointcloud_20m_10overlap.csv'));
     full_path=[data.data];
     
 %     data=[data.data]; 
