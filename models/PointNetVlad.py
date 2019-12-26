@@ -242,17 +242,19 @@ class PointNetVlad(nn.Module):
                                      is_training=True)
 
     def forward(self, x):
+        # x:[batch_size,1,num_points, 3]
         x = self.point_net(x)
+        # x:[batch_size,1024,num_points, 1]
         x = self.net_vlad(x)
         return x
 
 
 if __name__ == '__main__':
     num_points = 4096
-    sim_data = Variable(torch.rand(44, 1, num_points, 3))
+    sim_data = Variable(torch.rand(30, 1, num_points, 3))
     sim_data = sim_data.cuda()
 
-    pnv = PointNetVlad.PointNetVlad(global_feat=True, feature_transform=True, max_pool=False,
+    pnv = PointNetVlad(global_feat=True, feature_transform=True, max_pool=False,
                                     output_dim=256, num_points=num_points).cuda()
     pnv.train()
     out3 = pnv(sim_data)

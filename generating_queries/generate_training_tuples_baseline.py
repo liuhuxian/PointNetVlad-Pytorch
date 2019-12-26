@@ -37,6 +37,8 @@ p4 = [5734749.303802,619932.693364]
 p = [p1,p2,p3,p4]
 
 # 判断每一帧pointcloud是训练集还是测试集，将一个经纬度范围内的数据集设定为训练集
+# 在p = [p1,p2,p3,p4]附近的数据集为测试集
+# check (northing, easting) is whether in boxes described by (points, x_width, y_width)
 def check_in_test_set(northing, easting, points, x_width, y_width):
     in_test_set = False
     for point in points:

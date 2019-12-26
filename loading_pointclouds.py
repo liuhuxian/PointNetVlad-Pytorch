@@ -87,7 +87,7 @@ def get_query_tuple(dict_value, num_pos, num_neg, QUERY_DICT, hard_neg=[], other
         # get query tuple for dictionary entry
         # return list [query,positives,negatives]
 
-    # query poincloud
+    # query poincloud[4096, 3]
     query = load_pc_file(dict_value["query"])  # Nx3
 
 
@@ -103,7 +103,7 @@ def get_query_tuple(dict_value, num_pos, num_neg, QUERY_DICT, hard_neg=[], other
     neg_indices = []
 
     # 只要不是'positives50'里的帧都待定为negatives放入dict_negatives
-    dict_negatives = np.setdiff1d(list(range(len(dict_value['query']))),
+    dict_negatives = np.setdiff1d(list(range(len(QUERY_DICT))),
                                       dict_value['positives50']).tolist()
     random.shuffle(dict_negatives)
     if(len(hard_neg) == 0):

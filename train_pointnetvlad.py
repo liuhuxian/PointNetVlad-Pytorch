@@ -65,7 +65,7 @@ parser.add_argument('--triplet_use_best_positives', action='store_true',
                     help='If present, use best positives, otherwise use hardest positives')
 parser.add_argument('--resume', action='store_true',
                     help='If present, restore checkpoint and resume training')
-parser.add_argument('--dataset_folder', default='/home/huxian/drive/file-drive/HUXIAN/项目数据集/pointnetvlad/benchmark_datasets',
+parser.add_argument('--dataset_folder', default='/home/huxian/drive/file-drive/HUXIAN/ProjectsDatasets/pointnetvlad/benchmark_datasets',
                     help='PointNetVlad Dataset Folder')
 
 FLAGS = parser.parse_args()
@@ -112,6 +112,7 @@ BN_DECAY_DECAY_STEP = float(cfg.DECAY_STEP)
 cfg.BN_DECAY_CLIP = 0.99
 
 HARD_NEGATIVES = {}
+# 和get_random_hard_negatives有关系
 TRAINING_LATENT_VECTORS = []
 
 TOTAL_ITERATIONS = 0
@@ -250,7 +251,7 @@ def train_one_epoch(model, optimizer, train_writer, loss_function, epoch):
                 random.shuffle(dict_negatives)
                 negatives =dict_negatives[0:sampled_neg]
                 del dict_negatives
-                # 在negatives中选择距离最近的num_to_take来作为hard_negs
+                # 从negatives中选择(在pointnet输出特征意义上)距离最近的num_to_take个帧来作为hard_negs
                 hard_negs = get_random_hard_negatives(
                     query, negatives, num_to_take)
                 print(hard_negs)
@@ -269,6 +270,7 @@ def train_one_epoch(model, optimizer, train_writer, loss_function, epoch):
                 negatives = dict_negatives[0:sampled_neg]
                 del dict_negatives
 
+                # 从negatives中选择(在pointnet输出特征意义上)距离最近的num_to_take个帧来作为hard_negs
                 hard_negs = get_random_hard_negatives(
                     query, negatives, num_to_take)
                 # 将HARD_NEGATIVES[batch_keys[j]]和hard_negs合并，并且list化
@@ -319,8 +321,13 @@ def train_one_epoch(model, optimizer, train_writer, loss_function, epoch):
         model.train()
         optimizer.zero_grad()
 
+        # queries.shape(2, 1, 4096, 3),positives.shape(2, 2, 4096, 3),
+        # negatives.shape(2, 18, 4096, 3),other_neg.shape(2, 1, 4096, 3)
+        # output_queries.shapetorch.Size([2, 1, 256]),output_queries.shape[2, 1, 256]
+        #output_negatives.shape[2, 18, 256]
         output_queries, output_positives, output_negatives, output_other_neg = run_model(
             model, queries, positives, negatives, other_neg)
+
         loss = loss_function(output_queries, output_positives, output_negatives, output_other_neg, cfg.MARGIN_1, cfg.MARGIN_2, use_min=cfg.TRIPLET_USE_BEST_POSITIVES, lazy=cfg.LOSS_LAZY, ignore_zero_loss=cfg.LOSS_IGNORE_ZERO_BATCH)
         loss.backward()
         optimizer.step()
@@ -331,7 +338,8 @@ def train_one_epoch(model, optimizer, train_writer, loss_function, epoch):
 
         # EVALLLL
 
-        if (epoch > 5 and i % (1400 // cfg.BATCH_NUM_QUERIES) == 29):
+        # if (epoch > 5 and i % (1400 // cfg.BATCH_NUM_QUERIES) == 29):
+        if (i % (1400 // cfg.BATCH_NUM_QUERIES) == 29):
             TRAINING_LATENT_VECTORS = get_latent_vectors(
                 model, TRAINING_QUERIES)
             print("Updated cached feature vectors")

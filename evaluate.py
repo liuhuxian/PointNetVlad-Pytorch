@@ -49,6 +49,7 @@ def evaluate_model(model):
     DATABASE_SETS = get_sets_dict(cfg.EVAL_DATABASE_FILE)
     QUERY_SETS = get_sets_dict(cfg.EVAL_QUERY_FILE)
 
+
     if not os.path.exists(cfg.RESULTS_FOLDER):
         os.mkdir(cfg.RESULTS_FOLDER)
 
@@ -168,6 +169,8 @@ def get_recall(m, n, DATABASE_VECTORS, QUERY_VECTORS, QUERY_SETS):
     queries_output = QUERY_VECTORS[n]
 
     # print(len(queries_output))
+    # 将DATABASE_VECTORS中m文件夹里的文件进行聚类，形成一个小型的检索库
+    # 待会要用query文件检索这个检索库来测试算法的召回率
     database_nbrs = KDTree(database_output)
 
     num_neighbors = 25
@@ -188,6 +191,7 @@ def get_recall(m, n, DATABASE_VECTORS, QUERY_VECTORS, QUERY_SETS):
         for j in range(len(indices[0])):
             if indices[0][j] in true_neighbors:
                 if(j == 0):
+                    # 为什么similarity是这么算的?
                     similarity = np.dot(
                         queries_output[i], database_output[indices[0][j]])
                     top1_similarity_score.append(similarity)
@@ -221,7 +225,7 @@ if __name__ == "__main__":
                         help='Decay rate for lr decay [default: 0.8]')
     parser.add_argument('--results_dir', default='results/',
                         help='results dir [default: results]')
-    parser.add_argument('--dataset_folder', default='/home/huxian/drive/file-drive/HUXIAN/项目数据集/pointnetvlad/benchmark_datasets',
+    parser.add_argument('--dataset_folder', default='/home/huxian/drive/file-drive/HUXIAN/ProjectsDatasets/pointnetvlad/benchmark_datasets',
                         help='PointNetVlad Dataset Folder')
     FLAGS = parser.parse_args()
 
